@@ -32,24 +32,24 @@ public class MemberQuestionStackVoteController {
   }
 
 
-  /**
-   * Stack 정보와 질문의 투표 정보를 요청, accessToken에서 memberId 파싱함
-   *
-   * @param pageRequest {@link PageRequestDTO} 페이지네이션 를보를 담은 DTO 객체
-   * @param accessToken {@link String} accessToken
-   * @return service 계층에서 반환된 DTO가 ResponseEntity에 담겨 반환 됨
-   * @author hg_yellow
-   */
-  @GetMapping("/api/votes")
-  public ResponseEntity<InterviewQuestionDto.QuestionVoteResponseDto> getVoteInfos(
-      PageRequestDTO pageRequest,
-      @RequestHeader("Authorization") String accessToken) {
-    Long memberId = jwtTokenProvider.getUserIdFromToken(accessToken.substring(7));
-    HttpStatus status = HttpStatus.OK;
+    /**
+     * Stack 정보와 질문의 투표 정보를 요청, accessToken에서 memberId 파싱함
+     *
+     * @param pageRequest {@link PageRequestDTO} 페이지네이션 를보를 담은 DTO 객체
+     * @param accessToken {@link String} accessToken
+     * @return service 계층에서 반환된 DTO가 ResponseEntity에 담겨 반환 됨
+     * @author hg_yellow
+     */
+    @GetMapping("/api/votes")
+    public ResponseEntity<InterviewQuestionDto.QuestionVoteResponseDto> getVoteInfos(
+        PageRequestDTO pageRequest,
+        @RequestHeader("Authorization") String accessToken) {
+      Long memberId = jwtTokenProvider.getUserIdFromToken(accessToken.substring(7));
+      HttpStatus status = HttpStatus.OK;
 
-    InterviewQuestionDto.QuestionVoteResponseDto responseDto = memberQuestionStackVoteService.getVoteInfos(
-        memberId, pageRequest);
+      InterviewQuestionDto.QuestionVoteResponseDto responseDto = memberQuestionStackVoteService.getVoteInfos(
+          memberId, pageRequest);
 
-    return new ResponseEntity<>(responseDto, status);
-  }
+      return new ResponseEntity<>(responseDto, status);
+    }
 }

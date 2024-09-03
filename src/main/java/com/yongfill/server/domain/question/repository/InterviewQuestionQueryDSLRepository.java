@@ -118,63 +118,63 @@ public class InterviewQuestionQueryDSLRepository extends QuerydslRepositorySuppo
 
   }
 
-  /**
-   * 등록된 투표 질문들을 조회 함수, 페이지네이션 활용, 사용자가 어디에 투표했는지 나옴, 투표를 안 했을 경우 0으로 조회됨
-   *
-   * @param memberId {@link Long} 사용자 id
-   * @param pageable {@link Pageable} 페이지네이션 정보
-   * @return 조회된 결과가 담긴 Page 객체가 반환 됨
-   * @author hg_yellow
-   */
-  public Page<InterviewQuestionDto.QuestionVoteResponseDto.QuestionPageDto> getVoteQuestionInfo(
-      Long memberId, Pageable pageable) {
-    JPASQLQuery<?> jpaSqlQuery = new JPASQLQuery<>(em, configuration, queryHandler);
-    StringPath mqsv = Expressions.stringPath("mqsv");
-    StringPath iq = Expressions.stringPath("iq");
-    NumberPath<Long> voteMemberId = Expressions.numberPath(Long.class, qMemberQuestionStackVote, "member_id");
-    NumberPath<Long> voteQuestionId = Expressions.numberPath(Long.class, qMemberQuestionStackVote, "interview_question_id");
-    NumberPath<Long> voteStackId = Expressions.numberPath(Long.class, qMemberQuestionStackVote, "question_stack_id");
-    NumberPath<Long> qId = Expressions.numberPath(Long.class, qInterviewQuestion, "id");
-    NumberPath<Long> iqId = Expressions.numberPath(Long.class, iq, "id");
-    StringPath qQuestoin = Expressions.stringPath(qInterviewQuestion, "question");
-    StringPath qMemberId = Expressions.stringPath(qInterviewQuestion, "member_id");
+    /**
+     * 등록된 투표 질문들을 조회 함수, 페이지네이션 활용, 사용자가 어디에 투표했는지 나옴, 투표를 안 했을 경우 0으로 조회됨
+     *
+     * @param memberId {@link Long} 사용자 id
+     * @param pageable {@link Pageable} 페이지네이션 정보
+     * @return 조회된 결과가 담긴 Page 객체가 반환 됨
+     * @author hg_yellow
+     */
+    public Page<InterviewQuestionDto.QuestionVoteResponseDto.QuestionPageDto> getVoteQuestionInfo(
+        Long memberId, Pageable pageable) {
+      JPASQLQuery<?> jpaSqlQuery = new JPASQLQuery<>(em, configuration, queryHandler);
+      StringPath mqsv = Expressions.stringPath("mqsv");
+      StringPath iq = Expressions.stringPath("iq");
+      NumberPath<Long> voteMemberId = Expressions.numberPath(Long.class, qMemberQuestionStackVote, "member_id");
+      NumberPath<Long> voteQuestionId = Expressions.numberPath(Long.class, qMemberQuestionStackVote, "interview_question_id");
+      NumberPath<Long> voteStackId = Expressions.numberPath(Long.class, qMemberQuestionStackVote, "question_stack_id");
+      NumberPath<Long> qId = Expressions.numberPath(Long.class, qInterviewQuestion, "id");
+      NumberPath<Long> iqId = Expressions.numberPath(Long.class, iq, "id");
+      StringPath qQuestoin = Expressions.stringPath(qInterviewQuestion, "question");
+      StringPath qMemberId = Expressions.stringPath(qInterviewQuestion, "member_id");
 
-    List<InterviewQuestionDto.QuestionVoteResponseDto.QuestionPageDto> result =
-        jpaSqlQuery
-            .from(
-                JPAExpressions
-                    .select(qId, qQuestoin, qMemberId)
-                    .from(qInterviewQuestion)
-                    .where(Expressions.numberPath(Long.class, qInterviewQuestion, "question_stack_id").isNull())
-                    .orderBy(qInterviewQuestion.createDate.desc())
-                    .limit(pageable.getPageSize())
-                    .offset(pageable.getOffset()), iq)
-            .join(qMember)
-            .on(qMember.id.eq(Expressions.numberPath(Long.class, iq, "member_id")))
-            .join(qCountVote)
-            .on(iqId.eq(Expressions.numberPath(Long.class, qCountVote, "interview_question_id")))
-            .leftJoin(
-                JPAExpressions
-                    .select(voteMemberId, voteQuestionId, voteStackId)
-                    .from(qMemberQuestionStackVote)
-                    .where(voteMemberId.eq(memberId)), mqsv)
-            .on(iqId.eq(Expressions.numberPath(Long.class, mqsv, "interview_question_id")))
-            .transform(GroupBy.groupBy(iqId).list(
-                new QInterviewQuestionDto_QuestionVoteResponseDto_QuestionPageDto(
-                    iqId,
-                    Expressions.stringPath(iq, "question"),
-                    qMember.nickname,
-                    Expressions.numberPath(Long.class, mqsv, "question_stack_id").coalesce(0L),
-                    GroupBy.list(new QInterviewQuestionDto_QuestionVoteResponseDto_QuestionPageDto_StackDto(
-                            Expressions.numberPath(Long.class, qCountVote, "question_stack_id"),
-                            Expressions.numberPath(Long.class, qCountVote, "count_"))))));
+      List<InterviewQuestionDto.QuestionVoteResponseDto.QuestionPageDto> result =
+          jpaSqlQuery
+              .from(
+                  JPAExpressions
+                      .select(qId, qQuestoin, qMemberId)
+                      .from(qInterviewQuestion)
+                      .where(Expressions.numberPath(Long.class, qInterviewQuestion, "question_stack_id").isNull())
+                      .orderBy(qInterviewQuestion.createDate.desc())
+                      .limit(pageable.getPageSize())
+                      .offset(pageable.getOffset()), iq)
+              .join(qMember)
+              .on(qMember.id.eq(Expressions.numberPath(Long.class, iq, "member_id")))
+              .join(qCountVote)
+              .on(iqId.eq(Expressions.numberPath(Long.class, qCountVote, "interview_question_id")))
+              .leftJoin(
+                  JPAExpressions
+                      .select(voteMemberId, voteQuestionId, voteStackId)
+                      .from(qMemberQuestionStackVote)
+                      .where(voteMemberId.eq(memberId)), mqsv)
+              .on(iqId.eq(Expressions.numberPath(Long.class, mqsv, "interview_question_id")))
+              .transform(GroupBy.groupBy(iqId).list(
+                  new QInterviewQuestionDto_QuestionVoteResponseDto_QuestionPageDto(
+                      iqId,
+                      Expressions.stringPath(iq, "question"),
+                      qMember.nickname,
+                      Expressions.numberPath(Long.class, mqsv, "question_stack_id").coalesce(0L),
+                      GroupBy.list(new QInterviewQuestionDto_QuestionVoteResponseDto_QuestionPageDto_StackDto(
+                              Expressions.numberPath(Long.class, qCountVote, "question_stack_id"),
+                              Expressions.numberPath(Long.class, qCountVote, "count_"))))));
 
-    Long count = jpaQueryFactory
-        .selectFrom(qInterviewQuestion)
-        .where(qInterviewQuestion.questionStack.isNull())
-        .stream()
-        .count();
+      Long count = jpaQueryFactory
+          .selectFrom(qInterviewQuestion)
+          .where(qInterviewQuestion.questionStack.isNull())
+          .stream()
+          .count();
 
-    return new PageImpl<>(result, pageable, count);
-  }
+      return new PageImpl<>(result, pageable, count);
+    }
 }

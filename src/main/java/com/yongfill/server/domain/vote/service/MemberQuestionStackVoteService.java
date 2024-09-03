@@ -68,29 +68,29 @@ public class MemberQuestionStackVoteService {
     }
   }
 
-  /**
-   * Stack 정보와 질문의 투표 정보를 DTO로 재조립
-   *
-   * @param memberId       {@link Long} 사용자 id
-   * @param pageRequestDTO {@link PageRequestDTO} 페이지네이션 정보를 담은 DTO 객체
-   * @return 재조립된 DTO가 반환 됨
-   * @author hg_yellow
-   */
-  @Transactional
-  public InterviewQuestionDto.QuestionVoteResponseDto getVoteInfos(Long memberId,
-      PageRequestDTO pageRequestDTO) {
-    Page<InterviewQuestionDto.QuestionVoteResponseDto.QuestionPageDto> questions = interviewQuestionQueryDSLRepository.getVoteQuestionInfo(
-        memberId, PageRequest.of(pageRequestDTO.getPage(), pageRequestDTO.getSize()));
+    /**
+     * Stack 정보와 질문의 투표 정보를 DTO로 재조립
+     *
+     * @param memberId       {@link Long} 사용자 id
+     * @param pageRequestDTO {@link PageRequestDTO} 페이지네이션 정보를 담은 DTO 객체
+     * @return 재조립된 DTO가 반환 됨
+     * @author hg_yellow
+     */
+    @Transactional
+    public InterviewQuestionDto.QuestionVoteResponseDto getVoteInfos(Long memberId,
+        PageRequestDTO pageRequestDTO) {
+      Page<InterviewQuestionDto.QuestionVoteResponseDto.QuestionPageDto> questions = interviewQuestionQueryDSLRepository.getVoteQuestionInfo(
+          memberId, PageRequest.of(pageRequestDTO.getPage(), pageRequestDTO.getSize()));
 
-    List<InterviewQuestionDto.QuestionVoteResponseDto.StackInfoDto> stackInfoDtos = questionStackJpaRepository.findAll()
-        .stream()
-        .map(InterviewQuestionDto.QuestionVoteResponseDto.StackInfoDto::toDto)
-        .toList();
+      List<InterviewQuestionDto.QuestionVoteResponseDto.StackInfoDto> stackInfoDtos = questionStackJpaRepository.findAll()
+          .stream()
+          .map(InterviewQuestionDto.QuestionVoteResponseDto.StackInfoDto::toDto)
+          .toList();
 
-    return InterviewQuestionDto.QuestionVoteResponseDto
-        .builder()
-        .pageResponseDTO(new PageResponseNoEntityDto<>(questions))
-        .stackInfoDtos(stackInfoDtos)
-        .build();
-  }
+      return InterviewQuestionDto.QuestionVoteResponseDto
+          .builder()
+          .pageResponseDTO(new PageResponseNoEntityDto<>(questions))
+          .stackInfoDtos(stackInfoDtos)
+          .build();
+    }
 }
